@@ -10,17 +10,17 @@
         <div class="container-sm">
             <div class="row">
                 <div class="col-sm-12 row g-3"><br><br></div>
-                <c:forEach items="${answers}" var="answer">
-                    <div class="col-sm-12 fs-3">${answer.question.questionName}</div>
-                    <div class="row g-1"></div>
-                    <div class="col-sm-6 fs-3">${answer.answer}</div>
-                    <div class="col-sm-6 fs-3">Дата ответа:${answer.date}</div>
-                    <div class="row g-1"></div>
+                <c:forEach items="${answers}" var="entry">
+                    <div class="col-sm-12 fs-3">${entry.key.questionName}</div>
+                    <c:forEach items="${entry.value}" var="value">
+                        <div class="row g-1"></div>
+                        <div class="col-sm-6 fs-3">${value.answer}</div>
+                        <div class="col-sm-6 fs-3">Дата ответа:${value.date}</div>
+                        <div class="row g-1"></div>
+                    </c:forEach>
                 </c:forEach>
-                <div class="row g-1"></div>
             </div>
         </div>
-
     </jsp:body>
 
 </t:template_page>

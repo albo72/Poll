@@ -9,8 +9,7 @@ import com.albo.model.dao.*;
 import com.albo.dto.AnswerDTO;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnswerService {
@@ -29,16 +28,15 @@ public class AnswerService {
         }
     }
 
-    public List<Answer> getListOfAnswersOnQuestionsByUserId(int userId) throws ServiceException, AnswersNotFoundException {
+    public Map<Question,List<Answer>> getMapOfAnswersOnQuestionsByUserId(int userId) throws ServiceException, AnswersNotFoundException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             AnswerDao answerDao = factory.getAnswerDao();
             List<Answer> answers = answerDao.getListOfAnswersByUserId(userId);
-            if (answers.size() == 0){
+            if (answers.size() == 0) {
                 throw new AnswersNotFoundException("Answers not found");
             }
-            Map<Question, List<Answer>> collect = answers.stream().collect(Collectors.groupingBy(Answer::getQuestion));
-            return answers;
-
+            return answers.stream().collect(Collectors.groupingBy(Answer::getQuestion, () ->
+                    new TreeMap<>(Comparator.comparing(Question::getId)), Collectors.toList()));
         } catch (DaoException e) {
             throw new ServiceException(e);
         }

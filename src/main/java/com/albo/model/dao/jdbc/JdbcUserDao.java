@@ -186,8 +186,8 @@ public class JdbcUserDao implements UserDao {
         List<User> users = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT users.id, users.login, users.first_name, users.last_name, users.email, users.date_joined, " +
-                            "answer.*, question.* FROM answer LEFT JOIN question ON answer.question_id=question.id " +
+                    "SELECT distinct (users.id), users.login, users.first_name, users.last_name, users.email, users.date_joined " +
+                            "FROM answer LEFT JOIN question ON answer.question_id=question.id " +
                             "LEFT JOIN users ON answer.user_id = users.id WHERE question.poll_id = " + pollId +
                             " ORDER BY users.id "
             );

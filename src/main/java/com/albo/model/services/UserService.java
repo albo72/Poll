@@ -49,17 +49,7 @@ public class UserService {
             if (users.size() == 0) {
                 throw new DaoNoDataException("no users who passed the poll were found. Service exception");
             }
-            int previousUserId = 0;
-            int currentUserId;
-            List<User> listOfUsers = new ArrayList<>();
-            for (int i = 0; i < users.size(); i++) {
-                currentUserId = users.get(i).getId();
-                if(currentUserId!=previousUserId){
-                    listOfUsers.add(users.get(i));
-                }
-                previousUserId = currentUserId;
-            }
-            return listOfUsers;
+            return users;
         } catch (DaoException e) {
             throw new ServiceException(e);
         } catch (DaoNoDataException e) {

@@ -3,8 +3,8 @@ package com.albo.action;
 import com.albo.exception.ActionException;
 import com.albo.exception.AnswersNotFoundException;
 import com.albo.exception.ServiceException;
-import com.albo.exception.ServiceNoDataException;
 import com.albo.model.Answer;
+import com.albo.model.Question;
 import com.albo.model.services.AnswerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 
 public class ShowAnswersAction implements Action {
 
@@ -28,7 +29,7 @@ public class ShowAnswersAction implements Action {
         log.debug("create list of answers");
         int userId = Integer.parseInt(req.getParameter(USER_ID_PARAMETER));
         try {
-            List<Answer> answers = answerService.getListOfAnswersOnQuestionsByUserId(userId);
+            Map<Question,List<Answer>> answers = answerService.getMapOfAnswersOnQuestionsByUserId(userId);
             req.setAttribute(ATTRIBUTE_OF_ANSWERS, answers);
             return ANSWERS_PAGE;
         } catch (ServiceException e) {

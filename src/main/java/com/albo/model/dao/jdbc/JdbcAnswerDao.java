@@ -11,6 +11,7 @@ import com.albo.model.dao.DaoException;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JdbcAnswerDao implements AnswerDao {
@@ -66,18 +67,18 @@ public class JdbcAnswerDao implements AnswerDao {
 
     @Override
     public List<Answer> getListOfAnswersByUserId(int userId) throws DaoException {
-        List<Answer> answers = new ArrayList<>();
+        List<Answer> answers = new LinkedList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT answer.*, question.id, question.question_text FROM answer LEFT JOIN question ON " +
                             "answer.question_id = question.id WHERE answer.user_id = " + userId +
-                    " ORDER BY answer.question_id;"
+                    " ORDER BY answer.question_id "
             );
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()){
                 answers.add(new Answer(resultSet.getInt(1),new User(resultSet.getInt(2)),
                         new Question(resultSet.getInt(3),resultSet.getString(7)),
-                                resultSet.getString(4),resultSet.getTimestamp(5).toLocalDateTime()));
+                        resultSet.getString(4),resultSet.getTimestamp(5).toLocalDateTime()));
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
@@ -85,5 +86,4 @@ public class JdbcAnswerDao implements AnswerDao {
         }
         return answers;
     }
-
 }
