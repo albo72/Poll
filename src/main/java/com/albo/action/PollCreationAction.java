@@ -2,8 +2,9 @@ package com.albo.action;
 
 import com.albo.exception.ActionException;
 import com.albo.exception.ServiceException;
+import com.albo.model.builders.QuestionBuilder;
 import com.albo.model.services.PollService;
-import com.albo.model.Question;
+import com.albo.model.entities.Question;
 import com.albo.dto.PollDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +42,7 @@ public class PollCreationAction implements Action{
         String[] arrayOfQuestions = req.getParameterValues(POLL_QUESTIONS_PARAMETER);
         List<Question> questions = new ArrayList<>();
         for (String question:arrayOfQuestions) {
-            questions.add(new Question(question));
+            questions.add(new QuestionBuilder().withQuestionName(question).build());
         }
         PollDTO pollDTO = new PollDTO(name,description,dateEnd,questions);
         PollService pollService = new PollService();

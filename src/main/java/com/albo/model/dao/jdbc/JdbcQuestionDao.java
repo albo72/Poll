@@ -1,9 +1,9 @@
 package com.albo.model.dao.jdbc;
 
-import com.albo.model.Poll;
-import com.albo.model.Question;
+import com.albo.exception.JdbcException;
+import com.albo.model.entities.Poll;
+import com.albo.model.entities.Question;
 import com.albo.model.dao.ConnectionFactory;
-import com.albo.model.dao.DaoException;
 import com.albo.model.dao.QuestionDao;
 
 import java.sql.*;
@@ -17,7 +17,7 @@ public class JdbcQuestionDao implements QuestionDao {
     }
 
     @Override
-    public void create(Question question, Poll poll) throws DaoException {
+    public void create(Question question, Poll poll) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO question (poll_id,question_text) " +
@@ -28,12 +28,12 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create a question.", troubles);
+            throw new JdbcException("Can't create a question.", troubles);
         }
     }
 
     @Override
-    public void createListOfQuestions(List<Question> questions, Poll poll) throws DaoException {
+    public void createListOfQuestions(List<Question> questions, Poll poll) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO question (poll_id,question_text) " +
@@ -47,12 +47,12 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.executeBatch();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create questions.", troubles);
+            throw new JdbcException("Can't create questions.", troubles);
         }
     }
 
     @Override
-    public void update(Question question, Poll poll) {
+    public void update(Question question, Poll poll) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE question " +
@@ -65,7 +65,7 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't update this question. Dao exception",troubles);
         }
     }
 
@@ -75,7 +75,7 @@ public class JdbcQuestionDao implements QuestionDao {
     }
 
     @Override
-    public Question getBy(int id) {
+    public Question getBy(int id) throws JdbcException {
         Question question = null;
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -87,30 +87,30 @@ public class JdbcQuestionDao implements QuestionDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't get question. Dao exception", troubles);
         }
         return question;
     }
 
     @Override
-    public void deleteBy(int id) {
+    public void deleteBy(int id) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM question WHERE id=" + id);
             statement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't delete question. Dao exception", troubles);
         }
     }
 
     @Override
-    public void deleteByPollId(int pollId) throws DaoException {
+    public void deleteByPollId(int pollId) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM question WHERE poll_id=" + pollId);
             statement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("can' delete questions. dao exception");
+            throw new JdbcException("can' delete questions. dao exception");
         }
     }
 }

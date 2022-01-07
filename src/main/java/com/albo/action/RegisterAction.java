@@ -2,7 +2,7 @@ package com.albo.action;
 
 import com.albo.exception.ActionException;
 import com.albo.exception.ServiceException;
-import com.albo.model.User;
+import com.albo.model.entities.User;
 import com.albo.model.services.UserService;
 import com.albo.dto.RegistrationDTO;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -60,12 +60,12 @@ public class RegisterAction implements Action{
         RegistrationDTO registrationDTO = new RegistrationDTO(login, hashedPassword, firstName, lastName, email);
         try {
             User user = userService.signUp(registrationDTO);
-            log.trace("user {} was registered successfully", registrationDTO.getLogin());
+            log.trace("user {} with id {} was registered successfully", user.getLogin(), user.getId());
             HttpSession session = req.getSession(true);
             session.setAttribute(ATTRIBUTE_SESSION_USER, user);
             return REGISTER_SUCCESS;
         } catch (ServiceException e) {
-            log.trace("user registration was failed");
+            log.error("user registration was failed", e);
             return FORM_NAME;
         }
     }

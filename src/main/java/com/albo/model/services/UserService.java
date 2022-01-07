@@ -3,7 +3,8 @@ package com.albo.model.services;
 import com.albo.exception.DaoNoDataException;
 import com.albo.exception.ServiceException;
 import com.albo.exception.UserNotFoundException;
-import com.albo.model.User;
+import com.albo.model.entities.User;
+import com.albo.model.builders.UserBuilder;
 import com.albo.model.dao.DaoException;
 import com.albo.model.dao.DaoFactory;
 import com.albo.model.dao.UserDao;
@@ -12,7 +13,6 @@ import com.albo.dto.RegistrationDTO;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
@@ -60,13 +60,11 @@ public class UserService {
     public User signUp(RegistrationDTO input) throws ServiceException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             UserDao userDao = factory.getUserDao();
-            String login = input.getLogin();
-            String password = input.getPassword();
-            String firstName = input.getFirstName();
-            String lastName = input.getLastName();
-            String email = input.getEmail();
             LocalDateTime date = LocalDateTime.now();
-            return userDao.save(new User(login, password, false, firstName, lastName, email, date));
+            User user = new UserBuilder().withLogin(input.getLogin()).withPassword(input.getPassword()).
+                    withIsAdmin(false).withFirstName(input.getFirstName()).withLastName(input.getLastName()).
+                    withEmail(input.getEmail()).withDateJoined(date).build();
+            return userDao.save(user);
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
@@ -78,7 +76,8 @@ public class UserService {
             UserDao userDao = factory.getUserDao();
             String passwordForAnonymousUser = "anonym";
             String hashedPassword = DigestUtils.sha256Hex(passwordForAnonymousUser);
-            return userDao.saveAnonymousUser(new User(hashedPassword, date));
+            User user = new UserBuilder().withPassword(hashedPassword).withDateJoined(date).build();
+            return userDao.saveAnonymousUser(user);
         } catch (DaoException e) {
             throw new ServiceException(e);
         }

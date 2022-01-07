@@ -1,19 +1,18 @@
 package com.albo.model.dao;
 
-import com.albo.exception.DaoNoDataException;
-import com.albo.exception.JdbcException;
-import com.albo.model.Poll;
+import com.albo.model.entities.Poll;
 
 import java.util.List;
 
 public interface PollDao {
-    void create(Poll poll) throws DaoException;
 
     Poll createAndGet(Poll poll) throws DaoException;
 
-    void update(Poll poll);
+    void update(Poll poll) throws DaoException;
 
-    Poll getBy(int id) throws JdbcException, DaoNoDataException;
+    void updateActivity(Poll poll, boolean activity) throws DaoException;
+
+    Poll getBy(int id) throws DaoException;
 
     List<Poll> getAllPolls() throws DaoException;
 

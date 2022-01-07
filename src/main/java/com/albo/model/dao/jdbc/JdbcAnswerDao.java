@@ -1,16 +1,15 @@
 package com.albo.model.dao.jdbc;
 
 import com.albo.exception.JdbcException;
-import com.albo.model.Answer;
-import com.albo.model.Poll;
-import com.albo.model.Question;
-import com.albo.model.User;
+import com.albo.model.entities.Answer;
+import com.albo.model.entities.Question;
+import com.albo.model.entities.User;
+import com.albo.model.builders.UserBuilder;
 import com.albo.model.dao.AnswerDao;
 import com.albo.model.dao.ConnectionFactory;
 import com.albo.model.dao.DaoException;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class JdbcAnswerDao implements AnswerDao {
     }
 
     @Override
-    public void create(Answer answer) {
+    public void create(Answer answer) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "INSERT INTO answer (user_id,question_id,answer,answer_date) " +
@@ -35,12 +34,12 @@ public class JdbcAnswerDao implements AnswerDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't create the answer. Jdbc exception", troubles);
         }
     }
 
     @Override
-    public Answer getBy(int id) {
+    public Answer getBy(int id) throws JdbcException {
         Answer answer = null;
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -60,7 +59,7 @@ public class JdbcAnswerDao implements AnswerDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't get the answer.Jdbc exception", troubles);
         }
         return answer;
     }
@@ -75,8 +74,10 @@ public class JdbcAnswerDao implements AnswerDao {
                     " ORDER BY answer.question_id "
             );
             ResultSet resultSet = preparedStatement.executeQuery();
+            User user;
             while (resultSet.next()){
-                answers.add(new Answer(resultSet.getInt(1),new User(resultSet.getInt(2)),
+                user = new UserBuilder().withId(resultSet.getInt(2)).build();
+                answers.add(new Answer(resultSet.getInt(1),user,
                         new Question(resultSet.getInt(3),resultSet.getString(7)),
                         resultSet.getString(4),resultSet.getTimestamp(5).toLocalDateTime()));
             }

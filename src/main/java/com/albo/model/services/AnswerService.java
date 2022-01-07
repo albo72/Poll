@@ -2,9 +2,10 @@ package com.albo.model.services;
 
 import com.albo.exception.AnswersNotFoundException;
 import com.albo.exception.ServiceException;
-import com.albo.model.Answer;
-import com.albo.model.Question;
-import com.albo.model.User;
+import com.albo.model.entities.Answer;
+import com.albo.model.builders.AnswerBuilder;
+import com.albo.model.entities.Question;
+import com.albo.model.entities.User;
 import com.albo.model.dao.*;
 import com.albo.dto.AnswerDTO;
 
@@ -13,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AnswerService {
-    AnswerDao answerDao = AbstractDaoFactory.getAnswerDao();
 
     public void saveAnswer(AnswerDTO answerDTO) throws ServiceException {
         LocalDateTime date = LocalDateTime.now();
@@ -21,10 +21,12 @@ public class AnswerService {
             AnswerDao answerDao = factory.getAnswerDao();
             User user = answerDTO.getUser();
             Question question = answerDTO.getQuestion();
-            String answer = answerDTO.getAnswer();
-            answerDao.create(new Answer(user, question, answer, date));
+            String answerName = answerDTO.getAnswer();
+            Answer answer = new AnswerBuilder().withUser(user).withQuestion(question).withAnswer(answerName).
+                    withDate(date).build();
+            answerDao.create(answer);
         } catch (DaoException e) {
-            throw new ServiceException(e);
+            throw new ServiceException("Can't save answer. Service exception", e);
         }
     }
 
@@ -38,7 +40,7 @@ public class AnswerService {
             return answers.stream().collect(Collectors.groupingBy(Answer::getQuestion, () ->
                     new TreeMap<>(Comparator.comparing(Question::getId)), Collectors.toList()));
         } catch (DaoException e) {
-            throw new ServiceException(e);
+            throw new ServiceException("Can't get answers. Service exception", e);
         }
     }
 }

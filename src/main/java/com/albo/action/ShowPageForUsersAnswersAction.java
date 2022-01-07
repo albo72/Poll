@@ -3,7 +3,7 @@ package com.albo.action;
 import com.albo.exception.ActionException;
 import com.albo.exception.ServiceException;
 import com.albo.exception.UserNotFoundException;
-import com.albo.model.User;
+import com.albo.model.entities.User;
 import com.albo.model.services.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package com.albo.dto;
 
-import com.albo.model.Question;
+import com.albo.model.entities.Question;
 
 import java.time.LocalDateTime;
 import java.util.List;

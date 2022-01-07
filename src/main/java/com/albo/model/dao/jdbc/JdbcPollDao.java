@@ -1,9 +1,9 @@
 package com.albo.model.dao.jdbc;
 
-import com.albo.exception.DaoNoDataException;
 import com.albo.exception.JdbcException;
-import com.albo.model.Poll;
-import com.albo.model.Question;
+import com.albo.model.entities.Poll;
+import com.albo.model.builders.PollBuilder;
+import com.albo.model.entities.Question;
 import com.albo.model.dao.ConnectionFactory;
 import com.albo.model.dao.DaoException;
 import com.albo.model.dao.PollDao;
@@ -17,21 +17,6 @@ public class JdbcPollDao implements PollDao {
 
     public JdbcPollDao(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
-    }
-
-    @Override
-    public void create(Poll poll) throws DaoException {
-        try (Connection connection = connectionFactory.getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    "INSERT INTO poll (poll_name,description,date_start,date_end,is_active)" +
-                            "VALUES (?,?,?,?,?);"
-            );
-            setValuesInPollDao(poll, preparedStatement);
-            preparedStatement.execute();
-            preparedStatement.close();
-        } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create new poll.",troubles);
-        }
     }
 
     @Override
@@ -55,9 +40,11 @@ public class JdbcPollDao implements PollDao {
             setValuesInPollDao(poll,preparedStatement);
             ResultSet result = preparedStatement.executeQuery();
             result.next();
-            newPoll = new Poll(result.getInt(1),result.getString(2),result.getString(3),
-                    result.getTimestamp(4).toLocalDateTime(),
-                    result.getTimestamp(6).toLocalDateTime(), result.getBoolean(5));
+            newPoll = new PollBuilder().withId(result.getInt(1)).withName(result.getString(2)).
+                    withDescription(result.getString(3)).
+                    withDateStart(result.getTimestamp(4).toLocalDateTime()).
+                    withDateEnd(result.getTimestamp(6).toLocalDateTime()).
+                    withActivity(result.getBoolean(5)).build();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
             throw new DaoException("Can't create new poll.",troubles);
@@ -66,7 +53,7 @@ public class JdbcPollDao implements PollDao {
     }
 
     @Override
-    public void update(Poll poll) {
+    public void update(Poll poll) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "UPDATE poll " +
@@ -81,12 +68,28 @@ public class JdbcPollDao implements PollDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't update poll", troubles);
         }
     }
 
     @Override
-    public Poll getBy(int id) throws JdbcException, DaoNoDataException {
+    public void updateActivity(Poll poll, boolean activity) throws JdbcException {
+        try (Connection connection = connectionFactory.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "UPDATE poll " +
+                            "SET is_active=?" +
+                            "WHERE id=" + poll.getId()
+            );
+            preparedStatement.setBoolean(1, activity);
+            preparedStatement.execute();
+            preparedStatement.close();
+        } catch (SQLException | ClassNotFoundException troubles) {
+            throw new JdbcException("Can't update activity",troubles);
+        }
+    }
+
+    @Override
+    public Poll getBy(int id) throws JdbcException {
         Poll poll = null;
         List<Question> questions = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
@@ -107,7 +110,7 @@ public class JdbcPollDao implements PollDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get poll", troubles);
+            throw new JdbcException("No poll with this id or server exception", troubles);
         }
         return poll;
     }
@@ -153,11 +156,11 @@ public class JdbcPollDao implements PollDao {
         List<Poll> activePolls = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM poll WHERE is_active=" + true
+                    "SELECT * FROM poll WHERE date_end >= CURRENT_TIMESTAMP"
             );
             getResultsForListOfPolls(activePolls, preparedStatement);
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get active polls.",troubles);
+            throw new JdbcException("Can't get active polls. Jdbc exception",troubles);
         }
         return activePolls;
     }
@@ -167,7 +170,8 @@ public class JdbcPollDao implements PollDao {
         List<Poll> inactivePolls = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT * FROM poll WHERE is_active=" + false
+                    "SELECT * FROM poll WHERE is_active=" + false +
+                            " OR date_end < CURRENT_TIMESTAMP "
             );
             getResultsForListOfPolls(inactivePolls, preparedStatement);
         } catch (SQLException | ClassNotFoundException troubles) {
@@ -179,9 +183,11 @@ public class JdbcPollDao implements PollDao {
     private void getResultsForListOfPolls(List<Poll> polls, PreparedStatement preparedStatement) throws SQLException {
         ResultSet result = preparedStatement.executeQuery();
         while (result.next()) {
-            polls.add(new Poll(result.getInt(1), result.getString(2),
-                    result.getString(3), result.getTimestamp(4).toLocalDateTime(),
-                    result.getTimestamp(6).toLocalDateTime(), result.getBoolean(5)));
+            polls.add(new PollBuilder().withId(result.getInt(1)).withName(result.getString(2)).
+                    withDescription(result.getString(3)).
+                    withDateStart(result.getTimestamp(4).toLocalDateTime()).
+                    withDateEnd(result.getTimestamp(6).toLocalDateTime()).
+                    withActivity(result.getBoolean(5)).build());
         }
         preparedStatement.close();
     }

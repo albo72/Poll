@@ -1,16 +1,13 @@
 package com.albo.model.dao.jdbc;
 
 import com.albo.exception.JdbcException;
-import com.albo.model.Answer;
-import com.albo.model.User;
+import com.albo.model.entities.User;
 import com.albo.model.dao.ConnectionFactory;
-import com.albo.model.dao.DaoException;
 import com.albo.model.dao.UserDao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class JdbcUserDao implements UserDao {
     ConnectionFactory connectionFactory;
@@ -20,7 +17,7 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public User save(User user) throws DaoException {
+    public User save(User user) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             int id = 0;
             Statement statement = connection.createStatement();
@@ -38,12 +35,12 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.close();
             return user;
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create a user. This login already exists.", troubles);
+            throw new JdbcException("Can't create a user. This login already exists.", troubles);
         }
     }
 
     @Override
-    public User saveAnonymousUser(User user) throws DaoException {
+    public User saveAnonymousUser(User user) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             int id = 0;
             Statement statement = connection.createStatement();
@@ -57,15 +54,15 @@ public class JdbcUserDao implements UserDao {
                     "INSERT INTO users (id,login,password,date_joined) " +
                             "VALUES (?,?,?,?);"
             );
-            preparedStatement.setInt(1,id);
-            preparedStatement.setString(2,String.valueOf(id));
-            preparedStatement.setString(3,user.getPassword());
-            preparedStatement.setTimestamp(4,Timestamp.valueOf(user.getDateJoined()));
+            preparedStatement.setInt(1, id);
+            preparedStatement.setString(2, String.valueOf(id));
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setTimestamp(4, Timestamp.valueOf(user.getDateJoined()));
             preparedStatement.execute();
             preparedStatement.close();
             return user;
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create a user.", troubles);
+            throw new JdbcException("Can't create a user.", troubles);
         }
     }
 
@@ -89,7 +86,7 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't update user");
+            throw new JdbcException("Can't update user", troubles);
         }
     }
 
@@ -104,18 +101,8 @@ public class JdbcUserDao implements UserDao {
         preparedStatement.setTimestamp(8, Timestamp.valueOf(user.getDateJoined()));
     }
 
-    private void setValuesInUserDaoWithoutId(User user, PreparedStatement preparedStatement) throws SQLException {
-        preparedStatement.setString(1, user.getLogin());
-        preparedStatement.setString(2, user.getPassword());
-        preparedStatement.setBoolean(3, user.getIsAdmin());
-        preparedStatement.setString(4, user.getFirstName());
-        preparedStatement.setString(5, user.getLastName());
-        preparedStatement.setString(6, user.getEmail());
-        preparedStatement.setTimestamp(7, Timestamp.valueOf(user.getDateJoined()));
-    }
-
     @Override
-    public User getById(int id) {
+    public User getById(int id) throws JdbcException {
         User user = null;
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -130,14 +117,14 @@ public class JdbcUserDao implements UserDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            troubles.printStackTrace();
+            throw new JdbcException("Can't get user by id. Jdbc exception", troubles);
         }
         return user;
     }
 
 
     @Override
-    public User getByLogin(String login) throws DaoException {
+    public User getByLogin(String login) throws JdbcException {
         User user = null;
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -152,7 +139,7 @@ public class JdbcUserDao implements UserDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't find user. This login doesn't exist.", troubles);
+            throw new JdbcException("Can't find user. This login doesn't exist.", troubles);
         }
         return user;
     }
@@ -182,24 +169,25 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public List<User> getListOfUsersByPollId(int pollId) throws DaoException {
+    public List<User> getListOfUsersByPollId(int pollId) throws JdbcException {
         List<User> users = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT distinct (users.id), users.login, users.first_name, users.last_name, users.email, users.date_joined " +
+                    "SELECT distinct (users.id), users.* " +
                             "FROM answer LEFT JOIN question ON answer.question_id=question.id " +
                             "LEFT JOIN users ON answer.user_id = users.id WHERE question.poll_id = " + pollId +
                             " ORDER BY users.id "
             );
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()){
-                users.add(new User(resultSet.getInt(1),resultSet.getString(2),resultSet.getString(3),
-                        resultSet.getString(4),resultSet.getString(5),
-                        resultSet.getTimestamp(6).toLocalDateTime()));
+            ResultSet result = preparedStatement.executeQuery();
+            while (result.next()) {
+                users.add(new User(result.getInt(2), result.getString(3),
+                        result.getString(4), result.getBoolean(5),
+                        result.getString(6), result.getString(7),
+                        result.getString(8), result.getTimestamp(9).toLocalDateTime()));
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get users who have passed the poll.",troubles);
+            throw new JdbcException("Can't get users who have passed the poll.", troubles);
         }
         return users;
     }

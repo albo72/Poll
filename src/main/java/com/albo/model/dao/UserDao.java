@@ -2,7 +2,7 @@ package com.albo.model.dao;
 
 import com.albo.exception.DaoNoDataException;
 import com.albo.exception.JdbcException;
-import com.albo.model.User;
+import com.albo.model.entities.User;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public interface UserDao {
 
     void update(User user) throws JdbcException;
 
-    User getById(int id);
+    User getById(int id) throws JdbcException;
 
     User getByLogin(String login) throws DaoException;
 

@@ -3,7 +3,7 @@ package com.albo.action;
 import com.albo.exception.ActionException;
 import com.albo.exception.ServiceException;
 import com.albo.exception.ServiceNoDataException;
-import com.albo.model.Poll;
+import com.albo.model.entities.Poll;
 import com.albo.model.services.PollService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

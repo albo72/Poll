@@ -1,7 +1,7 @@
 package com.albo.dto;
 
-import com.albo.model.Question;
-import com.albo.model.User;
+import com.albo.model.entities.Question;
+import com.albo.model.entities.User;
 
 public class AnswerDTO {
     private User user;

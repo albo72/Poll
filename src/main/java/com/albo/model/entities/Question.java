@@ -1,4 +1,4 @@
-package com.albo.model;
+package com.albo.model.entities;
 
 import java.util.Objects;
 
@@ -11,20 +11,25 @@ public class Question {
         this.questionName = questionName;
     }
 
-    public Question(String questionName) {
-        this.questionName = questionName;
+    public Question() {
     }
 
     public int getId() {
         return id;
     }
 
+    public Question setId(int id) {
+        this.id = id;
+        return this;
+    }
+
     public String getQuestionName() {
         return questionName;
     }
 
-    public void setQuestionName(String questionName) {
+    public Question setQuestionName(String questionName) {
         this.questionName = questionName;
+        return this;
     }
 
     @Override

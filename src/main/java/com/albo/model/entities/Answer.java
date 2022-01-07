@@ -1,4 +1,4 @@
-package com.albo.model;
+package com.albo.model.entities;
 
 import java.time.LocalDateTime;
 
@@ -17,57 +17,51 @@ public class Answer {
         this.date = date;
     }
 
-    public Answer(User user, Question question, String answer, LocalDateTime date) {
-        this.user = user;
-        this.question = question;
-        this.answer = answer;
-        this.date = date;
-    }
-
-    public Answer(int id, String answer, LocalDateTime date) {
-        this.id = id;
-        this.answer = answer;
-        this.date = date;
+    public Answer() {
     }
 
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public Answer setId(int id) {
         this.id = id;
+        return this;
     }
 
     public User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public Answer setUser(User user) {
         this.user = user;
+        return this;
     }
 
     public Question getQuestion() {
         return question;
     }
 
-    public void setQuestion(Question question) {
+    public Answer setQuestion(Question question) {
         this.question = question;
+        return this;
     }
 
     public String getAnswer() {
         return answer;
     }
 
-    public void setAnswer(String answer) {
+    public Answer setAnswer(String answer) {
         this.answer = answer;
+        return this;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public Answer setDate(LocalDateTime date) {
         this.date = date;
+        return this;
     }
-
 }
