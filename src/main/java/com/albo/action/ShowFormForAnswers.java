@@ -15,6 +15,7 @@ import static com.albo.util.ConstantHolder.ATTRIBUTE_OF_POLL;
 
 public class ShowFormForAnswers implements Action{
 
+    private static final PollService pollService = new PollService();;
     private static final Logger log = LoggerFactory.getLogger(ShowFormForAnswers.class);
     private static final String FORM_PAGE = "poll-passing";
     private static final String POLL_ID_PARAMETER = "id";
@@ -24,20 +25,14 @@ public class ShowFormForAnswers implements Action{
         log.trace("create page for passing poll");
         int id = Integer.parseInt(req.getParameter(POLL_ID_PARAMETER));
         try{
-            Poll poll = getPollById(id);
+            Poll poll = pollService.getPollById(id);
             req.setAttribute(ATTRIBUTE_OF_POLL,poll);
             return FORM_PAGE;
         } catch (ServiceNoDataException e){
-            log.trace("Can't show poll");
+            log.error("Can't show poll", e);
             return "main";
-        }
-    }
-
-    private Poll getPollById(int id) throws ServiceNoDataException, ActionException {
-        PollService pollService = new PollService();
-        try {
-            return pollService.getPollById(id);
-        } catch (ServiceException e){
+        } catch (ServiceException e) {
+            log.error("Error. Server exception", e);
             throw new ActionException(e);
         }
     }

@@ -30,11 +30,11 @@ public class PollCreationAction implements Action{
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        log.trace("start to create poll");
+        log.debug("start to create poll");
         try {
             req.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.trace("Can't change encoding");
+            log.error("Can't change encoding", e);
         }
         String name = req.getParameter(POLL_NAME_PARAMETER);
         String description = req.getParameter(POLL_DESCRIPTION_PARAMETER);
@@ -48,10 +48,10 @@ public class PollCreationAction implements Action{
         PollService pollService = new PollService();
         try {
             pollService.createPoll(pollDTO);
-            log.trace("poll created");
+            log.debug("poll created");
             return POLL_CREATION_SUCCESS;
         } catch (ServiceException e) {
-            log.trace("poll creation was failed");
+            log.error("poll creation was failed", e);
             return POLL_CREATION_FORM_PAGE;
         }
     }

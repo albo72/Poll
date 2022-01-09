@@ -1,6 +1,6 @@
 package com.albo.action;
 
-import com.albo.Paginator;
+import com.albo.paginator.Paginator;
 import com.albo.exception.ActionException;
 import com.albo.exception.ServiceException;
 import com.albo.exception.ServiceNoDataException;
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-public class AllPollsAction implements Action{
+public class AllPollsAction implements Action {
     private static final Logger log = LoggerFactory.getLogger(AllPollsAction.class);
     private static final PollService pollService = new PollService();
     private static final String ATTRIBUTE_ALL_POLLS = "polls";
@@ -28,20 +28,20 @@ public class AllPollsAction implements Action{
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         log.debug("create list of polls");
         int currentPage = Integer.parseInt(req.getParameter("page"));
-        try{
+        try {
             int countOfElements = pollService.getCountOfAllPolls();
             Paginator paginator = new Paginator();
-            List<Integer> listOfPages = paginator.getListOfPages(currentPage,paginator.getCountOfPages(LIMIT,countOfElements));
-            List<Poll> listOfPolls = pollService.getAllPollsWithLimitAndOffset(LIMIT,paginator.getOffset(currentPage,LIMIT));
-            req.setAttribute(ATTRIBUTE_PAGE,currentPage);
+            List<Integer> listOfPages = paginator.getListOfPages(currentPage, paginator.getCountOfPages(LIMIT, countOfElements));
+            List<Poll> listOfPolls = pollService.getAllPollsWithLimitAndOffset(LIMIT, paginator.getOffset(currentPage, LIMIT));
+            req.setAttribute(ATTRIBUTE_PAGE, currentPage);
             req.setAttribute(ATTRIBUTE_ALL_POLLS, listOfPolls);
-            req.setAttribute(ATTRIBUTE_LIST_OF_PAGES,listOfPages);
+            req.setAttribute(ATTRIBUTE_LIST_OF_PAGES, listOfPages);
             return ALL_POLLS_PAGE;
         } catch (ServiceException e) {
-            log.error("Error. Server exception",e);
+            log.error("Error. Server exception", e);
             throw new ActionException(e);
         } catch (ServiceNoDataException e) {
-            log.debug("No polls, sorry",e);
+            log.error("No polls, sorry", e);
             return MAIN_PAGE;
         }
     }

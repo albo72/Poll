@@ -35,7 +35,7 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.close();
             return user;
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't create a user. This login already exists.", troubles);
+            throw new JdbcException("Can't create a user. This login already exists. Jdbc exception", troubles);
         }
     }
 
@@ -62,7 +62,7 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.close();
             return user;
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't create a user.", troubles);
+            throw new JdbcException("Can't create a user. Jdbc exception", troubles);
         }
     }
 
@@ -86,7 +86,7 @@ public class JdbcUserDao implements UserDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't update user", troubles);
+            throw new JdbcException("Can't update user. Jdbc exception", troubles);
         }
     }
 
@@ -139,7 +139,7 @@ public class JdbcUserDao implements UserDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't find user. This login doesn't exist.", troubles);
+            throw new JdbcException("Can't find user. This login doesn't exist. Jdbc exception", troubles);
         }
         return user;
     }
@@ -163,7 +163,7 @@ public class JdbcUserDao implements UserDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't find user. Wrong login or password", troubles);
+            throw new JdbcException("Can't find user. Wrong login or password. Jdbc exception", troubles);
         }
         return user;
     }
@@ -187,7 +187,7 @@ public class JdbcUserDao implements UserDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get users who have passed the poll.", troubles);
+            throw new JdbcException("Can't get users who have passed the poll. Jdbc exception", troubles);
         }
         return users;
     }

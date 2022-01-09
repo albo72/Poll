@@ -33,9 +33,9 @@ public class PersonalDataEditingAction implements Action {
         try {
             req.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.trace("Can't change encoding");
+            log.error("Can't change encoding", e);
         }
-        log.trace("start editing personal data");
+        log.debug("start editing personal data");
         HttpSession session = req.getSession(true);
         User user = (User) session.getAttribute(ATTRIBUTE_SESSION_USER);
         String login = req.getParameter(LOGIN_PARAMETER);
@@ -44,7 +44,7 @@ public class PersonalDataEditingAction implements Action {
         String lastName = req.getParameter(LAST_NAME_PARAMETER);
         String email = req.getParameter(EMAIL_PARAMETER);
         if (login.equals("") && password.equals("") && email.equals("")) {
-            log.trace("form's parameters are not valid");
+            log.debug("form's parameters are not valid");
             return FORM_PAGE;
         }
         EditionUserDTO editionUserDTO = new EditionUserDTO(user.getId(),login,password,user.getIsAdmin(),firstName,
@@ -52,10 +52,10 @@ public class PersonalDataEditingAction implements Action {
         try {
             User updatedUser = userService.updateUser(editionUserDTO);
             session.setAttribute(ATTRIBUTE_SESSION_USER,updatedUser);
-            log.trace("editing completed");
+            log.debug("editing completed");
             return EDITING_SUCCESS;
         } catch (ServiceException e) {
-            log.trace("Error. Can't update this user");
+            log.error("Error. Can't update this user", e);
             return FORM_PAGE;
         }
     }

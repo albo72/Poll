@@ -18,18 +18,16 @@ public class Question {
         return id;
     }
 
-    public Question setId(int id) {
+    public void setId(int id) {
         this.id = id;
-        return this;
     }
 
     public String getQuestionName() {
         return questionName;
     }
 
-    public Question setQuestionName(String questionName) {
+    public void setQuestionName(String questionName) {
         this.questionName = questionName;
-        return this;
     }
 
     @Override

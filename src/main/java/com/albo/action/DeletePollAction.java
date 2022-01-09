@@ -29,7 +29,7 @@ public class DeletePollAction implements Action{
             log.info("poll with id {} was deleted",id);
             return REDIRECT + PREVIOUS_PAGE_ACTION + END_URL;
         } catch (ServiceException e) {
-            log.trace("Error. Can't delete this poll");
+            log.error("Error. Can't delete this poll", e);
             throw new ActionException(e);
         }
 

@@ -14,8 +14,6 @@ public interface QuestionDao {
 
     void update(Question question, Poll poll) throws JdbcException;
 
-    void updateListOfQuestions(List<Question> questions, Poll poll);
-
     Question getBy(int id) throws JdbcException;
 
     void deleteBy(int id) throws JdbcException;

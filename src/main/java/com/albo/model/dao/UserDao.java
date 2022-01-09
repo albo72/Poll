@@ -18,7 +18,7 @@ public interface UserDao {
 
     User getByLogin(String login) throws DaoException;
 
-    User getByLoginAndPassword(String login, String password) throws DaoException, DaoNoDataException;
+    User getByLoginAndPassword(String login, String password) throws DaoException;
 
     List<User> getListOfUsersByPollId(int pollId) throws DaoException;
 }

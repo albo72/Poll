@@ -17,28 +17,17 @@ import java.util.List;
 
 public class UserService {
 
-    public User getUserByLogin(String login) throws Exception {
-        try (DaoFactory factory = DaoFactory.createFactory()) {
-            UserDao userDao = factory.getUserDao();
-            return userDao.getByLogin(login);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
-
-    }
 
     public User getUserByLoginAndPassword(String login, String password) throws ServiceException, UserNotFoundException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             UserDao userDao = factory.getUserDao();
             User user = userDao.getByLoginAndPassword(login, password);
             if (user == null) {
-                throw new DaoNoDataException("user not found");
+                throw new UserNotFoundException("user not found");
             }
             return user;
         } catch (DaoException e) {
             throw new ServiceException(e);
-        } catch (DaoNoDataException e) {
-            throw new UserNotFoundException(e);
         }
     }
 
@@ -47,13 +36,11 @@ public class UserService {
             UserDao userDao = factory.getUserDao();
             List<User> users = userDao.getListOfUsersByPollId(pollId);
             if (users.size() == 0) {
-                throw new DaoNoDataException("no users who passed the poll were found. Service exception");
+                throw new UserNotFoundException("no users who passed the poll were found. Service exception");
             }
             return users;
         } catch (DaoException e) {
             throw new ServiceException(e);
-        } catch (DaoNoDataException e) {
-            throw new UserNotFoundException(e);
         }
     }
 
@@ -86,15 +73,9 @@ public class UserService {
     public User updateUser(EditionUserDTO input) throws ServiceException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             UserDao userDao = factory.getUserDao();
-            int id = input.getId();
-            String login = input.getLogin();
-            String password = input.getPassword();
-            boolean isAdmin = input.isAdmin();
-            String firstName = input.getFirstName();
-            String lastName = input.getLastName();
-            String email = input.getEmail();
             LocalDateTime date = input.getDateJoined();
-            User user = new User(id, login, password, isAdmin, firstName, lastName, email, date);
+            User user = new User(input.getId(), input.getLogin(), input.getPassword(), input.isAdmin(),
+                    input.getFirstName(), input.getLastName(), input.getEmail(), date);
             userDao.update(user);
             return user;
         } catch (DaoException e) {

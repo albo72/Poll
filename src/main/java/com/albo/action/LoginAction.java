@@ -17,6 +17,7 @@ import static com.albo.util.ConstantHolder.*;
 
 public class LoginAction implements Action {
 
+    private static final UserService userService = new UserService();
     private static final Logger log = LoggerFactory.getLogger(LoginAction.class);
     private static final String FORM_NAME = "login";
     private static final String LOGIN_SUCCESS = "main";
@@ -32,24 +33,19 @@ public class LoginAction implements Action {
         String hashedPassword = DigestUtils.sha256Hex(password);
 
         try {
-            User user = checkUser(login, hashedPassword);
+            User user = userService.getUserByLoginAndPassword(login, hashedPassword);
             HttpSession session = req.getSession(true);
             session.setAttribute(ATTRIBUTE_SESSION_USER, user);
-            log.info("user with id {} is logged in",user.getId());
+            log.debug("user with id {} is logged in", user.getId());
             return LOGIN_SUCCESS;
         } catch (UserNotFoundException e) {
-            log.trace("User not found with login {}", login, e);
+            log.debug("User not found with login {}", login, e);
             req.setAttribute("incorrect", INCORRECT_DATA);
             return FORM_NAME;
+        } catch (ServiceException e) {
+            log.error("Error. Server exception", e);
+            throw new ActionException(e);
         }
     }
 
-    private User checkUser(String login, String password) throws UserNotFoundException {
-        UserService userService = new UserService();
-        try {
-            return userService.getUserByLoginAndPassword(login, password);
-        } catch (ServiceException e) {
-            throw new UserNotFoundException(e);
-        }
-    }
 }

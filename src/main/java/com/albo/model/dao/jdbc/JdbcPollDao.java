@@ -47,7 +47,7 @@ public class JdbcPollDao implements PollDao {
                     withActivity(result.getBoolean(5)).build();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("Can't create new poll.",troubles);
+            throw new DaoException("Can't create new poll. Jdbc exception",troubles);
         }
         return newPoll;
     }
@@ -68,7 +68,7 @@ public class JdbcPollDao implements PollDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't update poll", troubles);
+            throw new JdbcException("Can't update poll. Jdbc exception", troubles);
         }
     }
 
@@ -84,7 +84,7 @@ public class JdbcPollDao implements PollDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't update activity",troubles);
+            throw new JdbcException("Can't update activity. Jdbc exception",troubles);
         }
     }
 
@@ -94,7 +94,7 @@ public class JdbcPollDao implements PollDao {
         List<Question> questions = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT poll.*,question.id,question_text FROM poll left join question " +
+                    "SELECT poll.* FROM poll left join question " +
                             "ON poll.id=question.poll_id " +
                             "WHERE poll.id=" + id
             );
@@ -110,7 +110,7 @@ public class JdbcPollDao implements PollDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("No poll with this id or server exception", troubles);
+            throw new JdbcException("No poll with this id or server exception. Jdbc exception", troubles);
         }
         return poll;
     }
@@ -124,7 +124,7 @@ public class JdbcPollDao implements PollDao {
     }
 
     @Override
-    public List<Poll> getAllPolls() throws DaoException {
+    public List<Poll> getAllPolls() throws JdbcException {
         List<Poll> polls = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -132,13 +132,13 @@ public class JdbcPollDao implements PollDao {
             );
             getResultsForListOfPolls(polls, preparedStatement);
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get active polls.",troubles);
+            throw new JdbcException("Can't get active polls. Jdbc exception",troubles);
         }
         return polls;
     }
 
     @Override
-    public List<Poll> getAllPollsWithLimitAndOffset(int limit, int offset) throws DaoException {
+    public List<Poll> getAllPollsWithLimitAndOffset(int limit, int offset) throws JdbcException {
         List<Poll> polls = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -146,7 +146,7 @@ public class JdbcPollDao implements PollDao {
             );
             getResultsForListOfPolls(polls, preparedStatement);
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get active polls.",troubles);
+            throw new JdbcException("Can't get active polls. Jdbc exception",troubles);
         }
         return polls;
     }
@@ -166,7 +166,7 @@ public class JdbcPollDao implements PollDao {
     }
 
     @Override
-    public List<Poll> getInactivePolls() throws DaoException {
+    public List<Poll> getInactivePolls() throws JdbcException {
         List<Poll> inactivePolls = new ArrayList<>();
         try (Connection connection = connectionFactory.getConnection()) {
             PreparedStatement preparedStatement = connection.prepareStatement(
@@ -175,7 +175,7 @@ public class JdbcPollDao implements PollDao {
             );
             getResultsForListOfPolls(inactivePolls, preparedStatement);
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get inactive polls.",troubles);
+            throw new JdbcException("Can't get inactive polls. Jdbc exception",troubles);
         }
         return inactivePolls;
     }
@@ -193,13 +193,13 @@ public class JdbcPollDao implements PollDao {
     }
 
     @Override
-    public void deleteBy(int id) throws DaoException {
+    public void deleteBy(int id) throws JdbcException {
         try (Connection connection = connectionFactory.getConnection()) {
             Statement statement = connection.createStatement();
             statement.executeUpdate("DELETE FROM poll WHERE id=" + id);
             statement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new DaoException("can't delete poll. dao exception");
+            throw new JdbcException("can't delete poll. Jdbc exception", troubles);
         }
     }
 
@@ -214,7 +214,7 @@ public class JdbcPollDao implements PollDao {
             resultSet.next();
             countOfPolls = resultSet.getInt(1);
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get count of polls.",troubles);
+            throw new JdbcException("Can't get count of polls. Jdbc exception",troubles);
         }
         return countOfPolls;
     }

@@ -24,44 +24,39 @@ public class Answer {
         return id;
     }
 
-    public Answer setId(int id) {
+    public void setId(int id) {
         this.id = id;
-        return this;
     }
 
     public User getUser() {
         return user;
     }
 
-    public Answer setUser(User user) {
+    public void setUser(User user) {
         this.user = user;
-        return this;
     }
 
     public Question getQuestion() {
         return question;
     }
 
-    public Answer setQuestion(Question question) {
+    public void setQuestion(Question question) {
         this.question = question;
-        return this;
     }
 
     public String getAnswer() {
         return answer;
     }
 
-    public Answer setAnswer(String answer) {
+    public void setAnswer(String answer) {
         this.answer = answer;
-        return this;
     }
 
     public LocalDateTime getDate() {
         return date;
     }
 
-    public Answer setDate(LocalDateTime date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
-        return this;
     }
 }

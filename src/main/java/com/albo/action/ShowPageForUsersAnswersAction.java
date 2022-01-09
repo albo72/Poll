@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
-public class ShowPageForUsersAnswersAction implements Action{
+public class ShowPageForUsersAnswersAction implements Action {
 
     private static final Logger log = LoggerFactory.getLogger(ShowPageForUsersAnswersAction.class);
     private static final UserService userService = new UserService();
@@ -27,16 +27,16 @@ public class ShowPageForUsersAnswersAction implements Action{
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         log.debug("create page for users who passed poll");
         int id = Integer.parseInt(req.getParameter("id"));
-        try{
+        try {
             List<User> users = userService.getListOfUsersByPollId(id);
-            req.setAttribute(ATTRIBUTE_POLL_ID,id);
-            req.setAttribute(ATTRIBUTE_LIST_OF_USERS,users);
+            req.setAttribute(ATTRIBUTE_POLL_ID, id);
+            req.setAttribute(ATTRIBUTE_LIST_OF_USERS, users);
             return USERS_PAGE;
         } catch (UserNotFoundException e) {
-            log.debug("no users who passed the survey were found. Service exception",e);
+            log.debug("no users who passed the survey were found. Service exception", e);
             return USERS_PAGE;
         } catch (ServiceException e) {
-            log.error("Error. Server exception",e);
+            log.error("Error. Server exception", e);
             return START_PAGE;
         }
     }

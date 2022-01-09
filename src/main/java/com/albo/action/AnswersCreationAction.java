@@ -19,7 +19,7 @@ import java.io.UnsupportedEncodingException;
 
 import static com.albo.util.ConstantHolder.ATTRIBUTE_SESSION_USER;
 
-public class AnswersCreationAction implements Action{
+public class AnswersCreationAction implements Action {
     private static final AnswerService answerService = new AnswerService();
     private static final PollService pollService = new PollService();
 
@@ -36,41 +36,27 @@ public class AnswersCreationAction implements Action{
         try {
             req.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.trace("Can't change encoding");
+            log.error("Can't change encoding", e);
         }
         HttpSession session = req.getSession();
-        User user = (User)session.getAttribute(ATTRIBUTE_SESSION_USER);
+        User user = (User) session.getAttribute(ATTRIBUTE_SESSION_USER);
         int pollId = Integer.parseInt(req.getParameter(POLL_ID_PARAMETER));
         String[] arrayOfAnswers = req.getParameterValues(ANSWERS_PARAMETER);
         try {
-            Poll poll = getPollById(pollId);
+            Poll poll = pollService.getPollById(pollId);
             AnswerDTO answerDTO = null;
             for (int i = 0; i < poll.getListOfQuestions().size(); i++) {
-                answerDTO = new AnswerDTO(user,poll.getListOfQuestions().get(i),arrayOfAnswers[i]);
-                saveAnswers(answerDTO);
+                answerDTO = new AnswerDTO(user, poll.getListOfQuestions().get(i), arrayOfAnswers[i]);
+                answerService.saveAnswer(answerDTO);
             }
-            log.trace("Answers saved");
-        } catch (ServiceNoDataException e) {
-            log.trace("Error. Can't save answers");
-            return POLL_PASSING_PAGE;
-        }
-        return ANSWER_SAVING_SUCCESS;
-    }
-
-    private void saveAnswers(AnswerDTO answerDTO){
-        try {
-            answerService.saveAnswer(answerDTO);
+            log.debug("Answers saved");
+            return ANSWER_SAVING_SUCCESS;
         } catch (ServiceException e) {
-            log.trace("Can't save answer");
-        }
-
-    }
-
-    private Poll getPollById(int id) throws ServiceNoDataException, ActionException {
-        try {
-            return pollService.getPollById(id);
-        } catch (ServiceException e){
+            log.error("Error.", e);
             throw new ActionException(e);
+        } catch (ServiceNoDataException e) {
+            log.error("Error. Haven't poll with this id", e);
+            return POLL_PASSING_PAGE;
         }
     }
 }

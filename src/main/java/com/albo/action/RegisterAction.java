@@ -17,7 +17,7 @@ import java.io.UnsupportedEncodingException;
 
 import static com.albo.util.ConstantHolder.ATTRIBUTE_SESSION_USER;
 
-public class RegisterAction implements Action{
+public class RegisterAction implements Action {
 
     private static final Logger log = LoggerFactory.getLogger(RegisterAction.class);
     private static final UserService userService = new UserService();
@@ -31,7 +31,6 @@ public class RegisterAction implements Action{
     private static final String EMAIL_PARAMETER = "email";
 
 
-
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
 
@@ -39,7 +38,7 @@ public class RegisterAction implements Action{
         try {
             req.setCharacterEncoding("UTF-8");
         } catch (UnsupportedEncodingException e) {
-            log.trace("Can't change encoding");
+            log.error("Can't change encoding", e);
         }
         String login = req.getParameter(LOGIN_PARAMETER);
         String password = req.getParameter(PASSWORD_PARAMETER);
@@ -48,19 +47,14 @@ public class RegisterAction implements Action{
         String email = req.getParameter(EMAIL_PARAMETER);
 
         String hashedPassword = DigestUtils.sha256Hex(password);
-        try{
-            if(login.equals("") && password.equals("") && email.equals("")){
-                log.trace("register form's parameters are not valid");
-                return FORM_NAME;
-            }
-        }catch (Exception e){
-            throw new ActionException(e);
+        if (login.equals("") && password.equals("") && email.equals("")) {
+            log.debug("register form's parameters are not valid");
+            return FORM_NAME;
         }
-
         RegistrationDTO registrationDTO = new RegistrationDTO(login, hashedPassword, firstName, lastName, email);
         try {
             User user = userService.signUp(registrationDTO);
-            log.trace("user {} with id {} was registered successfully", user.getLogin(), user.getId());
+            log.debug("user {} with id {} was registered successfully", user.getLogin(), user.getId());
             HttpSession session = req.getSession(true);
             session.setAttribute(ATTRIBUTE_SESSION_USER, user);
             return REGISTER_SUCCESS;

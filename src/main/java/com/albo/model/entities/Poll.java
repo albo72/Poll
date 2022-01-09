@@ -39,53 +39,47 @@ public class Poll {
         return name;
     }
 
-    public Poll setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public Poll setDescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
-        return this;
     }
 
     public LocalDateTime getDateStart() {
         return dateStart;
     }
 
-    public Poll setDateStart(LocalDateTime dateStart) {
+    public void setDateStart(LocalDateTime dateStart) {
         this.dateStart = dateStart;
-        return this;
     }
 
     public LocalDateTime getDateEnd() {
         return dateEnd;
     }
 
-    public Poll setDateEnd(LocalDateTime dateEnd) {
+    public void setDateEnd(LocalDateTime dateEnd) {
         this.dateEnd = dateEnd;
-        return this;
     }
 
     public boolean isActivity() {
         return activity;
     }
 
-    public Poll setActivity(boolean activity) {
+    public void setActivity(boolean activity) {
         this.activity = activity;
-        return this;
     }
 
     public List<Question> getListOfQuestions() {
         return listOfQuestions;
     }
 
-    public Poll setListOfQuestions(List<Question> listOfQuestions) {
+    public void setListOfQuestions(List<Question> listOfQuestions) {
         this.listOfQuestions = listOfQuestions;
-        return this;
     }
 }

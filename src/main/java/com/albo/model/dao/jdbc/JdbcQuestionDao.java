@@ -28,7 +28,7 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't create a question.", troubles);
+            throw new JdbcException("Can't create a question. Jdbc exception", troubles);
         }
     }
 
@@ -47,7 +47,7 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.executeBatch();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't create questions.", troubles);
+            throw new JdbcException("Can't create questions. Jdbc exception", troubles);
         }
     }
 
@@ -65,13 +65,8 @@ public class JdbcQuestionDao implements QuestionDao {
             preparedStatement.execute();
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't update this question. Dao exception",troubles);
+            throw new JdbcException("Can't update this question. Jdbc exception",troubles);
         }
-    }
-
-    @Override
-    public void updateListOfQuestions(List<Question> questions, Poll poll) {
-
     }
 
     @Override
@@ -87,7 +82,7 @@ public class JdbcQuestionDao implements QuestionDao {
             }
             preparedStatement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't get question. Dao exception", troubles);
+            throw new JdbcException("Can't get question. Jdbc exception", troubles);
         }
         return question;
     }
@@ -99,7 +94,7 @@ public class JdbcQuestionDao implements QuestionDao {
             statement.executeUpdate("DELETE FROM question WHERE id=" + id);
             statement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("Can't delete question. Dao exception", troubles);
+            throw new JdbcException("Can't delete question. Jdbc exception", troubles);
         }
     }
 
@@ -110,7 +105,7 @@ public class JdbcQuestionDao implements QuestionDao {
             statement.executeUpdate("DELETE FROM question WHERE poll_id=" + pollId);
             statement.close();
         } catch (SQLException | ClassNotFoundException troubles) {
-            throw new JdbcException("can' delete questions. dao exception");
+            throw new JdbcException("Can't delete questions. Jdbc exception", troubles);
         }
     }
 }

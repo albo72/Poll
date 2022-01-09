@@ -1,4 +1,4 @@
-package com.albo;
+package com.albo.paginator;
 
 import java.util.ArrayList;
 import java.util.List;

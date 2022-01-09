@@ -25,20 +25,15 @@ public class InactivePollsAction implements Action{
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
         log.trace("create list of inactive polls");
         try{
-            List<Poll> listOfInactivePolls = getInactivePolls();
+            List<Poll> listOfInactivePolls = pollService.getInactivePolls();
             req.setAttribute(ATTRIBUTE_OF_INACTIVE_POLLS, listOfInactivePolls);
             return INACTIVE_POLLS_PAGE;
         } catch (ServiceNoDataException e){
-            log.trace("Can't show inactive polls");
+            log.error("Can't show inactive polls", e);
             return MAIN_PAGE;
-        }
-    }
-
-    private List<Poll> getInactivePolls() throws ServiceNoDataException {
-        try {
-            return pollService.getInactivePolls();
-        } catch (ServiceException e){
-            throw new ServiceNoDataException(e);
+        } catch (ServiceException e) {
+            log.error("Error. Server exception", e);
+            throw new ActionException(e);
         }
     }
 }

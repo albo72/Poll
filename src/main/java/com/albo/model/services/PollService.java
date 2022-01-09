@@ -20,26 +20,23 @@ public class PollService {
         Poll poll = new PollBuilder().withName(pollDTO.getName()).withDescription(pollDTO.getDescription()).
                 withDateStart(dateStart).withDateEnd(pollDTO.getDateEnd()).withActivity(pollDTO.isActive()).
                 withQuestions(pollDTO.getQuestions()).build();
-        try (DaoFactory factory = DaoFactory.createFactory()){
+        try (DaoFactory factory = DaoFactory.createFactory()) {
             PollDao pollDao = factory.getPollDao();
             poll = pollDao.createAndGet(poll);
             questionService.createListOfQuestions(pollDTO.getQuestions(), poll);
         } catch (DaoException e) {
-            throw new ServiceException("can't create poll. service exception");
+            throw new ServiceException("can't create poll. service exception", e);
         }
     }
 
-    /*public void updatePoll(PollDTO pollDTO) {
-        LocalDateTime dateStart = LocalDateTime.now();
-        LocalDateTime dateEnd = this.getTimeEnd(dateStart, pollDTO);
-        pollDao.update(new Poll(pollDTO.getName(), pollDTO.getDescription(), dateStart, dateEnd, pollDTO.isActive(),
-                pollDTO.getQuestions()));
-    }
-*/
     public Poll getPollById(int id) throws ServiceException, ServiceNoDataException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             PollDao pollDao = factory.getPollDao();
-            return pollDao.getBy(id);
+            Poll poll = pollDao.getBy(id);
+            if(poll == null){
+                throw new ServiceNoDataException("Haven't poll with this id");
+            }
+            return poll;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
@@ -65,10 +62,14 @@ public class PollService {
         }
     }
 
-    public List<Poll> getInactivePolls() throws ServiceException {
+    public List<Poll> getInactivePolls() throws ServiceException, ServiceNoDataException {
         try (DaoFactory factory = DaoFactory.createFactory()) {
             PollDao pollDao = factory.getPollDao();
-            return pollDao.getInactivePolls();
+            List<Poll> polls = pollDao.getInactivePolls();
+            if (polls.size() == 0) {
+                throw new ServiceNoDataException("There are no inactive polls");
+            }
+            return polls;
         } catch (DaoException e) {
             throw new ServiceException(e);
         }
@@ -104,12 +105,12 @@ public class PollService {
     }
 
     public void deletePollById(int pollId) throws ServiceException {
-        try (DaoFactory factory = DaoFactory.createFactory()){
+        try (DaoFactory factory = DaoFactory.createFactory()) {
             PollDao pollDao = factory.getPollDao();
             questionService.deleteQuestionsByPollId(pollId);
             pollDao.deleteBy(pollId);
         } catch (DaoException e) {
-            throw new ServiceException("can't delete poll. service exception");
+            throw new ServiceException("can't delete poll. service exception", e);
         }
     }
 

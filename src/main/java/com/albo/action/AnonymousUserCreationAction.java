@@ -14,7 +14,7 @@ import javax.servlet.http.HttpSession;
 import static com.albo.util.ConstantHolder.ATTRIBUTE_SESSION_USER;
 import static com.albo.util.ConstantHolder.REDIRECT;
 
-public class AnonymousUserCreationAction implements Action{
+public class AnonymousUserCreationAction implements Action {
 
     private static final Logger log = LoggerFactory.getLogger(AnonymousUserCreationAction.class);
     private static final UserService userService = new UserService();
@@ -24,20 +24,19 @@ public class AnonymousUserCreationAction implements Action{
 
     @Override
     public String execute(HttpServletRequest req, HttpServletResponse resp) throws ActionException {
-        log.trace("start to create anonymous user");
+        log.debug("start to create anonymous user");
         int pollId = Integer.parseInt(req.getParameter(POLL_ID_PARAMETER));
-        User user = saveAndGetAnonymousUser();
-        HttpSession session = req.getSession(true);
-        session.setAttribute(ATTRIBUTE_SESSION_USER,user);
-        return REDIRECT + NEXT_PAGE_NAME_WITH_ID_PARAMETER + pollId;
-    }
-
-    private User saveAndGetAnonymousUser() throws ActionException {
+        User user = null;
         try {
-            return userService.saveAnonymousUser();
+            user = userService.saveAnonymousUser();
+            HttpSession session = req.getSession(true);
+            session.setAttribute(ATTRIBUTE_SESSION_USER, user);
+            return REDIRECT + NEXT_PAGE_NAME_WITH_ID_PARAMETER + pollId;
         } catch (ServiceException e) {
-            log.trace("Can't save anonymous user");
+            log.error("Can't save anonymous user", e);
             throw new ActionException(e);
         }
+
     }
+
 }
